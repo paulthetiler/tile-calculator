@@ -1,0 +1,1271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Paul the Tiler Calculator</title>
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+  <style>
+    *{box-sizing:border-box}
+    body{margin:0;font-family:Arial,Helvetica,sans-serif;background:#f8fafc;color:#0f172a}
+    .page{min-height:100vh;padding:16px}
+    .container{max-width:1400px;margin:0 auto;display:grid;gap:24px}
+    @media(min-width:1100px){.container{grid-template-columns:1.2fr .8fr}}
+    .card{background:#fff;border:1px solid #e2e8f0;border-radius:20px;box-shadow:0 1px 3px rgba(0,0,0,.06);padding:20px}
+    .headerRow,.rowBetween{display:flex;justify-content:space-between;align-items:center}.wrap{flex-wrap:wrap}.gap{gap:16px}
+@media(max-width:768px){
+  .headerRow{
+    align-items:flex-start;
+    gap:8px;
+  }
+  .headerRow p{
+    margin:8px 0 0;
+  }
+  .toggleBar{
+    margin-top:4px;
+  }
+}
+    .title{font-size:32px;font-weight:700;letter-spacing:-.03em;margin:0}.teal{color:#256FA0}.muted{color:#64748b}.dim{color:#cbd5e1}
+    .smallText{font-size:14px}.tinyText{font-size:12px}.strong{font-weight:700}.right{text-align:right}.stack8>*+*{margin-top:8px}
+    .grid2,.grid3,.grid4{display:grid;gap:16px}.grid2{grid-template-columns:1fr}.grid3{grid-template-columns:1fr}.grid4{grid-template-columns:1fr}
+    @media(min-width:768px){.grid2{grid-template-columns:repeat(2,1fr)} .grid3{grid-template-columns:repeat(3,1fr)} .grid4{grid-template-columns:repeat(4,1fr)}}
+    .field{display:flex;flex-direction:column;gap:8px}.label{font-size:14px;font-weight:600;color:#334155}
+    input,select,textarea{width:100%;padding:12px 14px;border:1px solid #cbd5e1;border-radius:14px;font-size:16px;background:#fff}
+    input[type="checkbox"]{width:20px;height:20px;padding:0;border:0;border-radius:0;background:transparent}
+    .field input[type="checkbox"]{margin-top:10px}
+    textarea{min-height:90px;resize:vertical}.btn{border:0;border-radius:14px;padding:12px 16px;font-size:15px;font-weight:600;cursor:pointer}
+    .btnPrimary{background:#0f172a;color:#fff}.btnOutline{background:#fff;border:1px solid #cbd5e1;color:#0f172a}.btnFull{width:100%}
+    .toggleBar{display:flex;gap:8px;align-items:center}
+.toggleBar .btn{
+  min-width:90px;
+  height:58px;
+  padding:0 18px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  line-height:1;
+  position:relative;
+}
+.toggleBar .btn > *{line-height:1}
+.toggleBar .btn::first-line{line-height:1}
+@media(max-width:768px){
+  .toggleBar .btn{
+    height:58px;
+    min-height:58px;
+    padding:0 18px;
+  }
+}
+    .switchRow{display:flex;justify-content:space-between;align-items:center;gap:16px;border:1px solid #e2e8f0;border-radius:18px;padding:16px}
+    .switchRow input{width:20px;height:20px}.divider{height:1px;background:#e2e8f0;margin:20px 0}
+    .totalTop{background:#0f172a;color:#fff;border-radius:20px;padding:20px}.totalTop h2{font-size:40px;margin:8px 0 0}
+    .quoteBox{background:#fff;border:1px solid #e2e8f0;border-radius:18px;padding:20px}.quoteTitle{font-size:26px;margin:0}.totalBox{background:#0f172a;color:#fff;border-radius:18px;padding:20px;display:flex;justify-content:space-between;gap:16px;align-items:center}
+    .totalValue{font-size:34px;font-weight:700;margin:4px 0 0}.noteBox{background:#f8fafc;border:1px solid #e2e8f0;border-radius:16px;padding:16px;margin-top:16px}.prewrap{white-space:pre-wrap}
+    .badgeWrap{display:flex;flex-wrap:wrap;gap:8px}.badge{background:#f1f5f9;border-radius:999px;padding:8px 12px;font-size:13px}.warn{background:#fffbeb;border:1px solid #fcd34d;color:#92400e;border-radius:14px;padding:12px 14px;font-size:14px}
+    .sticky{position:static}@media(min-width:1100px){.sticky{position:sticky;top:24px;height:fit-content}}
+  
+.mode-toggle {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  margin: 10px 0 20px 0;
+}
+
+@media (max-width: 768px) {
+  .mode-toggle {
+    margin-top: 5px;
+    margin-bottom: 15px;
+  }
+}
+
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="container">
+    <div>
+      <div class="card">
+        <div class="headerRow wrap gap">
+          <div>
+            <h1 class="title"><span>Paul </span><span class="teal">the </span><span>Tiler</span></h1>
+            <p class="muted">Project Summary Tool</p>
+          </div>
+          <div class="toggleBar">
+            <button id="quickBtn" class="btn btnPrimary" type="button">Quick</button>
+            <button id="fullBtn" class="btn btnOutline" type="button">Full</button>
+          </div>
+        </div>
+
+        <div class="grid2">
+          <div class="field">
+            <label class="label">Prepared for client</label>
+            <input id="clientName" type="text" value="" placeholder="Client name" />
+          </div>
+          <div class="field">
+            <label class="label">Client address</label>
+            <textarea id="clientAddress" placeholder="Client address"></textarea>
+          </div>
+        </div>
+
+        <div class="switchRow" style="margin-top:12px">
+          <div>
+            <div class="strong">Facing customer mode</div>
+            <div class="muted smallText">Toggle wording for customer-facing or internal quotes.</div>
+          </div>
+          <input id="facingCustomerMode" type="checkbox" checked />
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="grid4">
+          <div class="field">
+            <label class="label">Job type</label>
+            <select id="jobType">
+              <option value="floor">Floor</option>
+              <option value="wall">Wall</option>
+              <option value="both">Both</option>
+            </select>
+          </div>
+          <div class="field">
+            <label class="label">Floor area (m²)</label>
+            <input id="floorArea" type="number" value="0" />
+          </div>
+          <div class="field">
+            <label class="label">Wall area (m²)</label>
+            <input id="wallArea" type="number" value="0" />
+          </div>
+          <div class="field">
+            <label class="label">Rounding mode</label>
+            <select id="roundingMode">
+              <option value="0.5">Nearest 0.5 m² up</option>
+              <option value="1">Nearest whole m² up</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="grid4">
+          <div class="field">
+            <label class="label">Floor tile type</label>
+            <select id="floorTileType">
+              <option value="standard">Standard</option>
+              <option value="large">Large format</option>
+              <option value="patterned">Patterned</option>
+              <option value="herringbone">Herringbone</option>
+              <option value="mosaic">Mosaic</option>
+              <option value="metro">Metro</option>
+              <option value="splitface">Split face</option>
+              <option value="custom">Custom</option>
+            </select>
+          </div>
+          <div class="field">
+            <label class="label">Wall tile type</label>
+            <select id="wallTileType">
+              <option value="standard">Standard</option>
+              <option value="large">Large format</option>
+              <option value="patterned">Patterned</option>
+              <option value="herringbone">Herringbone</option>
+              <option value="mosaic">Mosaic</option>
+              <option value="metro">Metro</option>
+              <option value="splitface">Split face</option>
+              <option value="custom">Custom</option>
+            </select>
+          </div>
+          <div class="field">
+            <label class="label">Custom floor rate (£/m²)</label>
+            <input id="customFloorRate" type="number" step="1" value="60" />
+          </div>
+          <div class="field">
+            <label class="label">Custom wall rate (£/m²)</label>
+            <input id="customWallRate" type="number" step="1" value="60" />
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+
+        <div class="divider"></div>
+
+        <div class="grid2">
+          <div class="switchRow">
+            <div>
+              <div class="strong">Auto-calculate linear metres (for epoxy pricing)</div>
+              <div class="muted smallText">Uses total charged area, tile size and pattern.</div>
+            </div>
+            <input id="useAutoLinearMetres" type="checkbox" checked />
+          </div>
+          <div class="field">
+            <label class="label">Manual linear metres</label>
+            <input id="linearMetres" type="number" value="0" />
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="grid2">
+          <div class="switchRow">
+            <div>
+              <div class="strong">Fiddly floor</div>
+              <div class="muted smallText">Adds uplift, not automatic day rate.</div>
+            </div>
+            <input id="fiddlyFloor" type="checkbox" />
+          </div>
+          <div class="switchRow">
+            <div>
+              <div class="strong">Fiddly wall / awkward metro</div>
+              <div class="muted smallText">Can trigger wall protection logic.</div>
+            </div>
+            <input id="fiddlyWall" type="checkbox" />
+          </div>
+        </div>
+
+        <div id="fullSection" style="display:none">
+          <div class="divider"></div>
+          <div class="grid4">
+            <div class="switchRow"><div class="strong">Self-levelling</div><input id="selfLevelling" type="checkbox" /></div>
+            <div class="field">
+              <label class="label strong">Decoupling</label>
+              <select id="decouplingModeSelect">
+                <option value="none">None</option>
+                <option value="supplyInstall">Supply & install</option>
+                <option value="labourOnly">Labour only</option>
+              </select>
+            </div>
+            <div class="switchRow"><div class="strong">Tanking</div><input id="tanking" type="checkbox" /></div>
+            <div class="switchRow"><div class="strong">Timber floor risk &amp; preparation allowance</div><input id="timberFloorPrep" type="checkbox" /></div>
+          </div>
+
+          <div class="divider"></div>
+          <div class="grid4">
+            <div class="switchRow"><div><div class="strong">Overboarding</div><div class="muted smallText">cement board / foam board / ply</div></div><input id="overboarding" type="checkbox" /></div>
+            <div class="field">
+              <label class="label">Board type</label>
+              <select id="boardType">
+                <option value="cement">Cement / foam board</option>
+                <option value="ply">Ply</option>
+              </select>
+            </div>
+            <div class="field"><label class="label">Boarding area (m²)</label><input id="boardingArea" type="number" value="0" /></div>
+            <div class="field"><label class="label">Board count</label><input id="boardCount" type="number" value="0" /></div>
+          </div>
+
+          <div class="divider"></div>
+          <div class="grid2">
+            <div class="field">
+              <label class="label">Removal type</label>
+              <select id="removalType">
+                <option value="none">None</option>
+                <option value="wall">Wall removal</option>
+                <option value="floor">Floor removal</option>
+                <option value="hardbed">Hard bed removal</option>
+                <option value="timberLoose">Wood / laminate removal (not stuck down)</option>
+                <option value="timberStuck">Wood / laminate removal (stuck down)</option>
+              </select>
+            </div>
+            <div class="field">
+              <label class="label">Waste handling</label>
+              <select id="wasteOption">
+                <option value="none">Customer removes waste (no charge)</option>
+                <option value="bags">Few bags (min £80)</option>
+                <option value="skip">8 yard skip (£250)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="divider"></div>
+          <div class="grid2">
+            <div class="field">
+              <label class="label">UFH mode</label>
+              <select id="ufhType">
+                <option value="none">None</option>
+                <option value="supplyInstall">Supply & install</option>
+                <option value="labourOnly">Labour only</option>
+                <option value="supplyOnly">Supply only</option>
+              </select>
+            </div>
+            <div class="field">
+              <label class="label">UFH area (m²)</label>
+              <input id="ufhArea" type="number" value="0" />
+            </div>
+          </div>
+
+          <div class="divider"></div>
+          <div class="grid4">
+            <div class="field">
+              <label class="label">Silicone mode</label>
+              <select id="siliconeMode">
+                <option value="none">None</option>
+                <option value="linear">Linear metres</option>
+                <option value="bathroom">Bathroom package</option>
+                <option value="largeBathroom">Large bathroom package</option>
+              </select>
+            </div>
+            <div class="field"><label class="label">Silicone lm</label><input id="siliconeLm" type="number" value="0" /></div>
+            <div class="field">
+              <label class="label">Colour-match silicone</label>
+              <select id="colourMatchSilicone">
+                <option value="none">None</option>
+                <option value="low">Low surcharge</option>
+                <option value="high">High surcharge</option>
+              </select>
+            </div>
+            <div class="field"><label class="label">Skirting lm</label><input id="skirtingLm" type="number" value="0" /></div>
+            <div class="field"><label class="label">Trims lm</label><input id="trimsLm" type="number" value="0" /></div>
+            <div class="field"><label class="label">Trim rate (£/lm)</label><input id="trimRate" type="number" value="15" /></div>
+            <div class="field"><label class="label">Single door profiles</label><input id="doorSingles" type="number" value="0" /></div>
+            <div class="field"><label class="label">Double door profiles</label><input id="doorDoubles" type="number" value="0" /></div>
+            <div class="field"><label class="label">Toilet cuts</label><input id="toiletCuts" type="number" value="0" /></div>
+            <div class="field"><label class="label">Sink stand cuts</label><input id="sinkStandCuts" type="number" value="0" /></div>
+            <div class="field"><label class="label">Mitred edges lm</label><input id="mitredEdgesLm" type="number" value="0" /></div>
+            <div class="field"><label class="label">Fabrication days</label><input id="fabricationDays" type="number" value="0" /></div>
+            <div class="field"><label class="label">Interruptive extras count</label><input id="interruptiveExtras" type="number" value="0" /></div>
+            <div class="field"><label class="label">Circle window cut</label><input id="circleWindow" type="checkbox" /></div>
+            <div class="field"><label class="label">Mosaic inside circle window</label><input id="circleWindowMosaic" type="checkbox" /></div>
+          </div>
+
+          <div class="divider"></div>
+          <div class="grid4">
+            <div class="switchRow"><div class="strong">Epoxy enabled</div><input id="epoxyEnabled" type="checkbox" /></div>
+            <div class="field">
+              <label class="label">Epoxy mode</label>
+              <select id="epoxyMode">
+                <option value="standard">Standard</option>
+                <option value="altLinear">Alt linear</option>
+                <option value="dayLabour">Day labour</option>
+                <option value="dayAllIn">Day all-in</option>
+              </select>
+            </div>
+            <div class="field"><label class="label">Epoxy floor grout lm</label><input id="epoxyFloorLm" type="number" value="0" /></div>
+            <div class="field"><label class="label">Epoxy wall grout lm</label><input id="epoxyWallLm" type="number" value="0" /></div>
+            <div class="field"><label class="label">Epoxy floor tile length</label><input id="epoxyFloorTileLengthMm" type="number" value="0" /></div>
+            <div class="field"><label class="label">Epoxy floor tile width</label><input id="epoxyFloorTileWidthMm" type="number" value="0" /></div>
+            <div class="field"><label class="label">Epoxy wall tile length</label><input id="epoxyWallTileLengthMm" type="number" value="0" /></div>
+            <div class="field"><label class="label">Epoxy wall tile width</label><input id="epoxyWallTileWidthMm" type="number" value="0" /></div>            
+            <div class="field"><label class="label">Epoxy days</label><input id="epoxyDays" type="number" value="1" /></div>
+          </div>
+
+          <div class="divider"></div>
+          <div class="grid3">
+            <div class="switchRow"><div class="strong">Use day-rate override</div><input id="useDayRateOverride" type="checkbox" /></div>
+            <div class="field"><label class="label">Full days</label><input id="dayRateDays" type="number" value="1" /></div>
+            <div class="field"><label class="label">Half days</label><input id="halfDays" type="number" value="0" /></div>
+          </div>
+
+          <div class="divider"></div>
+          <div class="grid3">
+            <div class="field">
+              <label class="label">Package logic</label>
+              <select id="packageMode">
+                <option value="none">None</option>
+                <option value="autoUnder60">Package under 60m² (-5%)</option>
+                <option value="auto60">Package 60–99.5m² (-10%)</option>
+                <option value="auto100">Package 100m²+ (-20%)</option>
+                <option value="manual">Manual package total</option>
+              </select>
+            </div>
+            <div class="field"><label class="label">Package total (£)</label><input id="packageOverrideValue" type="number" value="0" /></div>
+            <div class="field"><label class="label">Manual adjustment (% +/-)</label><input id="manualAdjustmentPercent" type="number" value="0" /></div>
+          </div>
+
+          <div class="divider"></div>
+          <div class="grid4">
+            <div class="field"><label class="label">Misc item 1</label><input id="miscItem1Desc" type="text" value="" /></div>
+            <div class="field"><label class="label">Misc item 1 price (£)</label><input id="miscItem1Price" type="number" value="0" /></div>
+            <div class="field"><label class="label">Misc item 2</label><input id="miscItem2Desc" type="text" value="" /></div>
+            <div class="field"><label class="label">Misc item 2 price (£)</label><input id="miscItem2Price" type="number" value="0" /></div>
+          </div>
+
+          <div class="divider"></div>
+          <div class="grid2">
+            <div class="field">
+              <label class="label">Round final total to (£)</label>
+              <input id="roundFinalTotalTo" type="number" value="0" />
+            </div>
+            <div class="field">
+              <label class="label">Rounded final total (£)</label>
+              <input id="roundedFinalTotal" type="number" value="0" />
+            </div>
+          </div>
+
+          <div class="divider"></div>
+          <div class="field">
+            <label class="label">Notes / assumptions</label>
+            <textarea id="notes"></textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sticky">
+      <div class="card">
+        <div class="rowBetween gap wrap">
+          <h2 style="margin:0">Quote summary</h2>
+          <button id="pdfBtnTop" class="btn btnOutline" type="button">Send / Download PDF</button>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="totalTop">
+          <div class="smallText dim">Total quote</div>
+          <h2 id="totalTopValue">£0</h2>
+          <div class="tinyText dim">No VAT added</div>
+        </div>
+
+        <div class="divider"></div>
+        <div id="summaryRows" class="stack8 smallText"></div>
+
+        <div class="divider"></div>
+        <div class="card" style="padding:16px;background:#f8fafc">
+          <p class="strong" style="margin-top:0">Job details</p>
+          <div id="jobDetails" class="stack8 smallText"></div>
+        </div>
+
+        <div class="divider"></div>
+        <div id="quoteOutput"></div>
+
+        <div class="divider"></div>
+        <div>
+          <p class="strong">Assumptions</p>
+          <div id="assumptions" class="badgeWrap"></div>
+        </div>
+
+        <div class="divider"></div>
+        <div>
+          <p class="strong">Protection / warnings</p>
+          <div id="warnings" class="stack8"></div>
+        </div>
+
+        <div class="divider"></div>
+        <div>
+          <p class="strong">Package target guide</p>
+          <p class="muted tinyText">Use this as a rough low / middle / high package steer, based on the job total and the type of customer.</p>
+          <div id="packageGuide" class="stack8 smallText"></div>
+        </div>
+
+        <div class="divider"></div>
+        <div class="smallText stack8">
+          <p class="strong">Paul the Tiler</p>
+          <p>www.paulthetiler.co.uk</p>
+          <p>paul@paulthetiler.co.uk</p>
+          <p>01925 899755</p>
+          <p class="muted">Warrington, Cheshire</p>
+        </div>
+
+        <div class="divider"></div>
+        <button id="pdfBtnBottom" class="btn btnPrimary btnFull" type="button">Send / Download Quote PDF</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const PRICING = {
+  business: { name:'Paul the Tiler', website:'www.paulthetiler.co.uk', email:'paul@paulthetiler.co.uk', phone:'01925 899755', location:'Warrington, Cheshire'.trim() },
+  floorRates: { standard:60, large:75, patterned:85, herringbone:105, mosaic:150, splitface:150, metro:85, custom:60 },
+  wallRates: { standard:60, large:75, patterned:85, herringbone:105, mosaic:150, splitface:150, metro:85, custom:60 },
+  uplifts: { smallFloorUnder20:10, fiddlyFloorDefault:8, interruptiveMinimum:50 },
+  dayRates: { full:300, half:180, twoDay:600, packageUnder60DiscountPercent:5, package60PlusDiscountPercent:10, package100PlusDiscountPercent:20 },
+  prep: { selfLevellingMin:300, selfLevellingPerM2:37, overboardingPerBoard:40, plyOverboardingPerBoard:50, overboardingMin:200, tankingBase:395, tankingExtraPerM2:35, decouplingLabourOnlyMinUnder5:120, decouplingLabourOnlyPerM2:16, decouplingSupplyInstallPerM2:40, decouplingSupplyInstallMinUnder5:120, timberFloorPrepMin:300 },
+  materials: { adhesiveGroutPerM2:7 },
+  extras: { skirtingPerLm:25, siliconePerLm:19, siliconeMin:120, siliconeBathroomStandard:350, siliconeBathroomLarge:550, colourMatchSiliconeLow:75, colourMatchSiliconeHigh:150, toiletCut:60, sinkStandCut:60, doorProfileSingle:25, doorProfileDouble:50, circleWindowCut:150, circleWindowMosaicInside:200, mitredEdgesResinPerLm:100 },
+  removal: { wallPerM2:20, floorPerM2:28, hardBedPerM2:42, timberLoosePerM2:20, timberStuckPerM2:35 },
+  epoxy: { minUnder40Lm:450, over40LmPerLm:8.5, altUnder50LmPerLm:10, altOver50LmPerLm:7, labourDay:1200, allInDay:1350 },
+  fabrication: { mitreDayRate: 1200, thresholdLm: 10 },
+  ufh: { minimum:720, upTo10:120, from10To20:100, over20:87, labourOnlyFactor:0.45, supplyOnlyFactor:0.55 },
+  wastePercent:10,
+  packageGuide: { lowDiscountPercent:18, midDiscountPercent:20, highDiscountPercent:22 }
+};
+
+let mode = 'quick';
+
+function val(id){ const el=document.getElementById(id); return el ? el.value : ''; }
+function num(id){ return Number(val(id)) || 0; }
+function checked(id){ const el=document.getElementById(id); return !!(el && el.checked); }
+
+function roundArea(value, mode) {
+  const v = Number(value) || 0;
+  if (mode === '1') return Math.ceil(v);
+  return Math.ceil(v * 2) / 2;
+}
+function getSafeWastePercent() {
+  return Math.min(Number(PRICING.wastePercent) || 0, 20);
+}
+function getBaseRate(surface, tileType, customRate, chargedArea) {
+  if (tileType === 'custom') return Number(customRate) || 0;
+  let rate = surface === 'wall' ? PRICING.wallRates[tileType] : PRICING.floorRates[tileType];
+  if (surface === 'floor' && tileType === 'large') {
+    const area = Number(chargedArea) || 0;
+    if (area >= 100) return 65;
+    if (area >= 60) return 70;
+    return PRICING.floorRates.large;
+  }
+  return rate;
+}
+function syncDisplayedCustomRates() {
+  const roundingMode = val('roundingMode');
+  const floorTileType = val('floorTileType');
+  const wallTileType = val('wallTileType');
+  const wastePercent = getSafeWastePercent();
+  const floorChargedArea = roundArea((num('floorArea') || 0) * (1 + wastePercent / 100), roundingMode);
+  const wallChargedArea = roundArea((num('wallArea') || 0) * (1 + wastePercent / 100), roundingMode);
+
+  if (floorTileType !== 'custom') {
+    document.getElementById('customFloorRate').value = getBaseRate('floor', floorTileType, 0, floorChargedArea);
+  }
+  if (wallTileType !== 'custom') {
+    document.getElementById('customWallRate').value = getBaseRate('wall', wallTileType, 0, wallChargedArea);
+  }
+}
+function getPatternFactor(pattern) {
+  if (pattern === 'brick') return 1.08;
+  if (pattern === 'herringbone') return 1.22;
+  return 1;
+}
+function calcEstimatedLinearMetres(area, tileLengthMm, tileWidthMm, pattern) {
+  const a = Number(area) || 0;
+  const lengthM = (Number(tileLengthMm) || 0) / 1000;
+  const widthM = (Number(tileWidthMm) || 0) / 1000;
+  if (!a || !lengthM || !widthM) return 0;
+  const base = a * ((1 / lengthM) + (1 / widthM));
+  return Math.round(base * getPatternFactor(pattern));
+}
+function calcUFH(type, area) {
+  const a = Number(area) || 0;
+  if (!a || type === 'none') return 0;
+  const baseRate = a <= 10 ? PRICING.ufh.upTo10 : a <= 20 ? PRICING.ufh.from10To20 : PRICING.ufh.over20;
+  const fullValue = Math.max(PRICING.ufh.minimum, Math.round(a * baseRate));
+  if (type === 'supplyInstall') return fullValue;
+  if (type === 'labourOnly') return Math.round(fullValue * PRICING.ufh.labourOnlyFactor);
+  if (type === 'supplyOnly') return Math.round(fullValue * PRICING.ufh.supplyOnlyFactor);
+  return 0;
+}
+function calcEpoxy(enabled, mode, lm, days) {
+  if (!enabled) return 0;
+  const length = Number(lm) || 0;
+  const d = Number(days) || 0;
+  if (mode === 'standard') return length <= 40 ? PRICING.epoxy.minUnder40Lm : Math.round(length * PRICING.epoxy.over40LmPerLm);
+  if (mode === 'altLinear') return length <= 50 ? Math.round(length * PRICING.epoxy.altUnder50LmPerLm) : Math.round(length * PRICING.epoxy.altOver50LmPerLm);
+  if (mode === 'dayLabour') return Math.round(d * PRICING.epoxy.labourDay);
+  if (mode === 'dayAllIn') return Math.round(d * PRICING.epoxy.allInDay);
+  return 0;
+}
+function calcSurface(area, surface, tileType, customRate, roundingMode, fiddlyFloor, fiddlyWall) {
+  const rawArea = Number(area) || 0;
+  const wastePercent = getSafeWastePercent();
+  const shouldAddWaste = !(surface === 'floor' && rawArea >= 60);
+  const chargeableAreaBase = shouldAddWaste ? rawArea * (1 + wastePercent / 100) : rawArea;
+  const chargedArea = roundArea(chargeableAreaBase, roundingMode);
+  let rate = getBaseRate(surface, tileType, customRate, chargedArea);
+  const assumptions = [];
+  const warnings = [];
+  if (surface === 'floor' && rawArea >= 60) assumptions.push('No waste uplift charged on floors 60m² and above.');
+  if (surface === 'floor' && chargedArea > 0 && chargedArea < 20) { rate += PRICING.uplifts.smallFloorUnder20; assumptions.push('Under-20m² floor uplift applied.'); }
+  if (surface === 'floor' && fiddlyFloor && chargedArea > 0) { rate += PRICING.uplifts.fiddlyFloorDefault; assumptions.push('Fiddly floor uplift applied.'); }
+  let labour = Math.round(chargedArea * rate);
+  const materials = Math.round(chargedArea * PRICING.materials.adhesiveGroutPerM2);
+  if (surface === 'wall' && fiddlyWall && chargedArea > 0 && chargedArea <= 12) { labour = Math.max(labour, PRICING.dayRates.twoDay); assumptions.push('Small fiddly wall / metro protection applied at minimum 2-day rate.'); }
+  if (chargedArea > 0 && chargedArea < 5) { labour = Math.max(labour, PRICING.dayRates.full); warnings.push('Small job protection triggered.'); }
+  if (rawArea > 0 && chargedArea > rawArea * 1.5) warnings.push('Area inflation warning: charged area looks too high, so waste has been capped for safety.');
+  return { surface, rawArea, chargedArea, rate, labour, materials, assumptions, warnings };
+}
+function applyLargeFloorPackageLogic(total, combinedChargedArea, packageMode, assumptions, warnings) {
+  const area = Number(combinedChargedArea) || 0;
+  if (!area) return total;
+
+  if (packageMode === 'autoUnder60' && area < 60) {
+    assumptions.push(`Under-60m² package logic applied at ${PRICING.dayRates.packageUnder60DiscountPercent}% reduction.`);
+    return Math.round(total * (1 - PRICING.dayRates.packageUnder60DiscountPercent / 100));
+  }
+  if (packageMode === 'auto60' && area >= 60 && area < 100) {
+    assumptions.push(`60–99.5m² package logic applied at ${PRICING.dayRates.package60PlusDiscountPercent}% reduction.`);
+    return Math.round(total * (1 - PRICING.dayRates.package60PlusDiscountPercent / 100));
+  }
+  if (packageMode === 'auto100' && area >= 100) {
+    assumptions.push(`100m²+ package logic applied at ${PRICING.dayRates.package100PlusDiscountPercent}% reduction.`);
+    return Math.round(total * (1 - PRICING.dayRates.package100PlusDiscountPercent / 100));
+  }
+
+  if (packageMode === 'autoUnder60' && area >= 60) warnings.push('Under-60 package option selected, but combined tiled area is 60m² or above.');
+  if (packageMode === 'auto60' && area < 60) warnings.push('60–99.5m² package option selected, but combined tiled area is under 60m².');
+  if (packageMode === 'auto60' && area >= 100) warnings.push('60–99.5m² package option selected, but combined tiled area is 100m² or above.');
+  if (packageMode === 'auto100' && area < 100) warnings.push('100m²+ package option selected, but combined tiled area is under 100m².');
+  if (area >= 100 && packageMode === 'none') warnings.push('100m²+ combined tiled area: consider package pricing rather than straight m² pricing.');
+  else if (area >= 60 && packageMode === 'none') warnings.push('60m²+ combined tiled area: consider package pricing or slight rate reduction.');
+
+  return total;
+}
+function formatCurrency(value){ return `£${Number(value||0).toLocaleString()}`; }
+function row(label, value){ return `<div class="rowBetween smallRow"><span class="muted">${label}</span><span class="strong right">${value}</span></div>`; }
+
+function getCustomerFacingRate(result) {
+  const totalArea = (Number(result.floor.chargedArea) || 0) + (Number(result.wall.chargedArea) || 0);
+  if (!totalArea) return 0;
+  return Math.round((Number(result.subtotal) || 0) / totalArea);
+}
+function isPackageQuote(form, result) {
+  if ((form.packageMode === 'manual' && Number(form.packageOverrideValue) > 0)) return true;
+  const combinedArea = (Number(result.floor.chargedArea) || 0) + (Number(result.wall.chargedArea) || 0);
+  if (form.packageMode === 'autoUnder60' && combinedArea < 60) return true;
+  if (form.packageMode === 'auto60' && combinedArea >= 60 && combinedArea < 100) return true;
+  if (form.packageMode === 'auto100' && combinedArea >= 100) return true;
+  return false;
+}
+function buildIncludedItems(form, result) {
+  const items = [];
+  const totalArea = (Number(result.floor.chargedArea) || 0) + (Number(result.wall.chargedArea) || 0);
+  if (totalArea > 0) {
+    if (form.jobType === 'floor') items.push({ title: 'Full floor installation', desc: `Supply and fix labour based on approximately ${result.floor.chargedArea} m².` });
+    else if (form.jobType === 'wall') items.push({ title: 'Full wall installation', desc: `Supply and fix labour based on approximately ${result.wall.chargedArea} m².` });
+    else items.push({ title: 'Full tiling installation', desc: `Supply and fix labour covering approximately ${totalArea} m² in total.` });
+  }
+  if (form.selfLevelling) items.push({ title: 'Self-levelling', desc: 'Subfloor preparation to improve flatness and support a proper installation.' });
+  if (form.overboarding) items.push({ title: 'Overboarding', desc: 'Additional boarding where required to improve substrate stability before tiling.' });
+  if (form.tanking) items.push({ title: 'Tanking', desc: 'Waterproof preparation to wet areas where selected.' });
+  if (form.decoupling) items.push({ title: 'Decoupling', desc: form.decouplingMode === 'labourOnly' ? 'Installation of decoupling system using customer-supplied materials.' : 'Supply and installation of decoupling system.' });
+  if (form.timberFloorPrep) items.push({ title: 'Timber floor preparation', desc: 'Allowance for strengthening and preparing a timber subfloor before tiling.' });
+  if (form.removalType !== 'none') items.push({ title: 'Tile removal', desc: 'Removal of existing finishes and basic clear-out based on the selected removal type.' });
+  if (form.wasteOption === 'bags') items.push({ title: 'Waste removal', desc: 'Small waste collection allowance included.' });
+  if (form.wasteOption === 'skip') items.push({ title: 'Waste removal', desc: 'Skip allowance included.' });
+  if (form.ufhType !== 'none') items.push({ title: 'Underfloor heating', desc: 'Underfloor heating priced in line with the selected supply and installation option.' });
+  if (form.epoxyEnabled) items.push({ title: 'Epoxy grout', desc: 'Epoxy grouting allowance included where selected.' });
+  if (form.siliconeMode !== 'none') items.push({ title: 'Silicone finishing', desc: 'Final silicone sealing included where selected.' });
+  if ((Number(form.skirtingLm) || 0) > 0) items.push({ title: 'Tiled skirting', desc: `Tiled skirting allowance included for approximately ${form.skirtingLm} linear metres.` });
+  if ((Number(form.trimsLm) || 0) > 0) items.push({ title: 'Trims', desc: `Trim allowance included for approximately ${form.trimsLm} linear metres.` });
+  if ((Number(form.doorSingles) || 0) > 0 || (Number(form.doorDoubles) || 0) > 0) items.push({ title: 'Door profiles', desc: 'Door threshold profiles included where selected.' });
+  if ((Number(form.toiletCuts) || 0) > 0 || (Number(form.sinkStandCuts) || 0) > 0) items.push({ title: 'Sanitary cut-outs', desc: 'Allowance included for the selected toilet or sink stand cut-outs.' });
+  if ((Number(form.mitredEdgesLm) || 0) > 0) items.push({ title: 'Mitred edges', desc: 'Mitred edge work included where selected.' });
+  if (form.circleWindow) items.push({ title: 'Circle window cut', desc: 'Allowance included for circular window cutting.' });
+  if (form.circleWindowMosaic) items.push({ title: 'Circle window mosaic detail', desc: 'Allowance included for mosaic detailing inside the circular opening.' });
+  if ((Number(form.interruptiveExtras) || 0) > 0) items.push({ title: 'Additional detail work', desc: 'Allowance included for small interruptive extras selected on the quote.' });
+  if (form.miscItem1Desc && (Number(form.miscItem1Price) || 0) > 0) items.push({ title: form.miscItem1Desc, desc: `Additional allowance included: ${formatCurrency(form.miscItem1Price)}.` });
+  if (form.miscItem2Desc && (Number(form.miscItem2Price) || 0) > 0) items.push({ title: form.miscItem2Desc, desc: `Additional allowance included: ${formatCurrency(form.miscItem2Price)}.` });
+  return items;
+}
+function buildCustomerQuoteHtml(form, result) {
+  const includedItems = buildIncludedItems(form, result);
+  const packageQuote = isPackageQuote(form, result);
+  const totalArea = (Number(result.floor.chargedArea) || 0) + (Number(result.wall.chargedArea) || 0);
+  return `
+    <div class="quoteBox">
+      <div class="rowBetween gap wrap">
+        <div>
+          <h3 class="quoteTitle"><span>Paul </span><span class="teal">the </span><span>Tiler</span></h3>
+          <p class="muted">${form.facingCustomerMode ? 'Quote' : 'Project Quote'}</p>
+        </div>
+        <div class="right smallText muted">
+          <p>${new Date().toLocaleDateString('en-GB')}</p>
+          <p>${PRICING.business.website}</p>
+          <p>${PRICING.business.phone}</p>
+        </div>
+      </div>
+      <div class="divider"></div>
+      ${(form.clientName || form.clientAddress) ? `
+        <div class="noteBox smallText">
+          <p class="strong">Prepared for</p>
+          ${form.clientName ? `<p style="margin:0 0 4px">${form.clientName}</p>` : ''}
+          ${form.clientAddress ? `<p class="prewrap muted" style="margin:0">${form.clientAddress}</p>` : ''}
+        </div>
+        <div class="divider"></div>
+      ` : ''}
+      <div class="grid2 smallText">
+        ${row('Floor area', `${result.floor.rawArea || 0} m²`)}
+        ${row('Wall area', `${result.wall.rawArea || 0} m²`)}
+      </div>
+      <div class="divider"></div>
+      ${packageQuote ? `<p class="strong">Included in this package</p>` : `<p class="strong">Included in this quote</p>`}
+      <div class="smallText stack8">
+        ${includedItems.length ? includedItems.map(item => `<div><p class="strong" style="margin:0 0 4px">${item.title}</p><p class="muted" style="margin:0">${item.desc}</p></div>`).join('') : `<p class="muted">Tiling installation based on the information provided.</p>`}
+      </div>
+      <div class="divider"></div>
+      <div class="totalBox">
+        <div>
+          <p class="smallText dim">${packageQuote ? 'Package total' : 'Total quote'}</p>
+          <p class="totalValue">${formatCurrency(result.subtotal)}</p>
+        </div>
+        <div class="right tinyText dim">
+          <p>No VAT added</p>
+          <p>Customer supplies tiles only</p>
+        </div>
+      </div>
+      ${result.notes.trim() ? `<div class="noteBox smallText"><p class="strong">Notes</p><p class="prewrap">${result.notes}</p></div>` : ''}
+    </div>`;
+}
+
+function getPackageTargetGuide(baseSubtotal) {
+  const subtotal = Number(baseSubtotal) || 0;
+  if (!subtotal) {
+    return {
+      low: 0,
+      mid: 0,
+      high: 0,
+      lowDiscount: PRICING.packageGuide.lowDiscountPercent,
+      midDiscount: PRICING.packageGuide.midDiscountPercent,
+      highDiscount: PRICING.packageGuide.highDiscountPercent
+    };
+  }
+  return {
+    low: Math.round(subtotal * (1 - PRICING.packageGuide.lowDiscountPercent / 100)),
+    mid: Math.round(subtotal * (1 - PRICING.packageGuide.midDiscountPercent / 100)),
+    high: Math.round(subtotal * (1 - PRICING.packageGuide.highDiscountPercent / 100)),
+    lowDiscount: PRICING.packageGuide.lowDiscountPercent,
+    midDiscount: PRICING.packageGuide.midDiscountPercent,
+    highDiscount: PRICING.packageGuide.highDiscountPercent
+  };
+}
+
+function getState() {
+  return {
+    facingCustomerMode: checked('facingCustomerMode'),
+    clientName: val('clientName').trim(),
+    clientAddress: val('clientAddress').trim(),
+    jobType: val('jobType'),
+    floorArea: num('floorArea'),
+    wallArea: num('wallArea'),
+    roundingMode: val('roundingMode'),
+    floorTileType: val('floorTileType'),
+    wallTileType: val('wallTileType'),
+    customFloorRate: num('customFloorRate'),
+    customWallRate: num('customWallRate'),
+    useAutoLinearMetres: checked('useAutoLinearMetres'),
+    linearMetres: num('linearMetres'),
+    fiddlyFloor: checked('fiddlyFloor'),
+    fiddlyWall: checked('fiddlyWall'),
+    selfLevelling: checked('selfLevelling'),
+    overboarding: checked('overboarding'),
+    boardType: val('boardType'),
+    boardCount: num('boardCount'),
+    tanking: checked('tanking'),
+    decoupling: val('decouplingModeSelect') !== 'none',
+    decouplingMode: val('decouplingModeSelect'),
+    timberFloorPrep: checked('timberFloorPrep'),
+    removalType: val('removalType'),
+    wasteOption: val('wasteOption'),
+    ufhType: val('ufhType'),
+    ufhArea: num('ufhArea'),
+    siliconeMode: val('siliconeMode'),
+    siliconeLm: num('siliconeLm'),
+    colourMatchSilicone: val('colourMatchSilicone'),
+    skirtingLm: num('skirtingLm'),
+    trimsLm: num('trimsLm'),
+    trimRate: num('trimRate'),
+    doorSingles: num('doorSingles'),
+    doorDoubles: num('doorDoubles'),
+    toiletCuts: num('toiletCuts'),
+    sinkStandCuts: num('sinkStandCuts'),
+    circleWindow: checked('circleWindow'),
+    circleWindowMosaic: checked('circleWindowMosaic'),
+    mitredEdgesLm: num('mitredEdgesLm'),
+    fabricationDays: num('fabricationDays'),
+    interruptiveExtras: num('interruptiveExtras'),
+    epoxyEnabled: checked('epoxyEnabled'),
+    epoxyMode: val('epoxyMode'),
+    epoxyFloorLm: num('epoxyFloorLm'),
+    epoxyWallLm: num('epoxyWallLm'),
+    epoxyDays: num('epoxyDays'),
+    epoxyFloorTileLengthMm: num('epoxyFloorTileLengthMm'),
+    epoxyFloorTileWidthMm: num('epoxyFloorTileWidthMm'),
+    epoxyWallTileLengthMm: num('epoxyWallTileLengthMm'),
+    epoxyWallTileWidthMm: num('epoxyWallTileWidthMm'),
+    useDayRateOverride: checked('useDayRateOverride'),
+    dayRateDays: num('dayRateDays'),
+    halfDays: num('halfDays'),
+    packageMode: val('packageMode'),
+    packageOverrideValue: num('packageOverrideValue'),
+    manualAdjustmentPercent: num('manualAdjustmentPercent'),
+    miscItem1Desc: val('miscItem1Desc').trim(),
+    miscItem1Price: num('miscItem1Price'),
+    miscItem2Desc: val('miscItem2Desc').trim(),
+    miscItem2Price: num('miscItem2Price'),
+    roundFinalTotalTo: num('roundFinalTotalTo'),
+    roundedFinalTotal: num('roundedFinalTotal'),
+    notes: val('notes')
+  };
+}
+
+function calculateQuote(form) {
+  const floor = calcSurface(form.floorArea, 'floor', form.floorTileType, form.customFloorRate, form.roundingMode, form.fiddlyFloor, form.fiddlyWall);
+  const wall = calcSurface(form.wallArea, 'wall', form.wallTileType, form.customWallRate, form.roundingMode, form.fiddlyFloor, form.fiddlyWall);
+  const totalChargedArea = floor.chargedArea + wall.chargedArea;
+  const autoFloorLinearMetres = calcEstimatedLinearMetres(floor.chargedArea, form.epoxyFloorTileLengthMm, form.epoxyFloorTileWidthMm, 'straight');
+  const autoWallLinearMetres = calcEstimatedLinearMetres(wall.chargedArea, form.epoxyWallTileLengthMm, form.epoxyWallTileWidthMm, 'straight');
+  const activeLinearMetres = form.useAutoLinearMetres ? (autoFloorLinearMetres + autoWallLinearMetres) : Number(form.linearMetres) || 0;
+  const assumptions = [...floor.assumptions, ...wall.assumptions];
+  const warnings = [...floor.warnings, ...wall.warnings];
+  let labourTotal = floor.labour + wall.labour;
+  const materialsTotal = floor.materials + wall.materials;
+  if (form.useDayRateOverride) { labourTotal = Math.round((Number(form.dayRateDays) || 0) * PRICING.dayRates.full + (Number(form.halfDays) || 0) * PRICING.dayRates.half); assumptions.push('Manual day-rate override applied.'); }
+  let prepTotal = 0;
+  if (form.selfLevelling) { prepTotal += Math.max(PRICING.prep.selfLevellingMin, Math.round(floor.chargedArea * PRICING.prep.selfLevellingPerM2)); assumptions.push('Self-levelling priced with materials included.'); }
+  if (form.overboarding) {
+      const boardCost = Math.round((Number(form.boardCount) || 0) * PRICING.prep.overboardingPerBoard);
+      const applied = Math.max(PRICING.prep.overboardingMin, boardCost);
+      prepTotal += applied;
+      if (applied === PRICING.prep.overboardingMin && boardCost < PRICING.prep.overboardingMin) {
+        assumptions.push('Minimum charge applied (overboarding).');
+      }
+    }
+  if (form.tanking) prepTotal += Math.round(PRICING.prep.tankingBase + wall.chargedArea * PRICING.prep.tankingExtraPerM2);
+  if (form.decoupling) prepTotal += form.decouplingMode === 'labourOnly' ? (floor.chargedArea < 5 ? PRICING.prep.decouplingLabourOnlyMinUnder5 : Math.round(floor.chargedArea * PRICING.prep.decouplingLabourOnlyPerM2)) : (floor.chargedArea < 5 ? PRICING.prep.decouplingSupplyInstallMinUnder5 : Math.round(floor.chargedArea * PRICING.prep.decouplingSupplyInstallPerM2));
+  if (form.timberFloorPrep) { prepTotal += PRICING.prep.timberFloorPrepMin; assumptions.push('Timber floor prep allowance applied.'); }
+
+  let removalTotal = 0;
+  if (form.removalType === 'wall') removalTotal += Math.round(wall.chargedArea * PRICING.removal.wallPerM2);
+  if (form.removalType === 'floor') removalTotal += Math.round(floor.chargedArea * PRICING.removal.floorPerM2);
+  if (form.removalType === 'hardbed') removalTotal += Math.round(floor.chargedArea * PRICING.removal.hardBedPerM2);
+  if (form.removalType === 'timberLoose') { removalTotal += Math.round(floor.chargedArea * PRICING.removal.timberLoosePerM2); assumptions.push('Wood / laminate removal priced at £20/m².'); }
+  if (form.removalType === 'timberStuck') { removalTotal += Math.round(floor.chargedArea * PRICING.removal.timberStuckPerM2); assumptions.push('Stuck wood / laminate removal priced at £35/m².'); }
+  if (form.wasteOption === 'bags') { removalTotal += 80; assumptions.push('Waste: few bags (minimum charge £80).'); }
+  if (form.wasteOption === 'skip') { removalTotal += 250; assumptions.push('Waste: 8 yard skip added (£250).'); }
+
+  const ufhTotal = calcUFH(form.ufhType, Number(form.ufhArea) || floor.chargedArea);
+  if (form.ufhType !== 'none') assumptions.push('UFH priced separately using tiered structure.');
+
+  let extrasTotal = 0;
+  if (form.siliconeMode === 'linear') extrasTotal += Math.max(PRICING.extras.siliconeMin, Math.round((Number(form.siliconeLm) || 0) * PRICING.extras.siliconePerLm));
+  if (form.siliconeMode === 'bathroom') extrasTotal += PRICING.extras.siliconeBathroomStandard;
+  if (form.siliconeMode === 'largeBathroom') extrasTotal += PRICING.extras.siliconeBathroomLarge;
+  if (form.colourMatchSilicone === 'low') extrasTotal += PRICING.extras.colourMatchSiliconeLow;
+  if (form.colourMatchSilicone === 'high') extrasTotal += PRICING.extras.colourMatchSiliconeHigh;
+  extrasTotal += Math.round((Number(form.skirtingLm) || 0) * PRICING.extras.skirtingPerLm);
+  extrasTotal += Math.round((Number(form.trimsLm) || 0) * (Number(form.trimRate) || 0));
+  extrasTotal += Math.round((Number(form.doorSingles) || 0) * PRICING.extras.doorProfileSingle);
+  extrasTotal += Math.round((Number(form.doorDoubles) || 0) * PRICING.extras.doorProfileDouble);
+  extrasTotal += Math.round((Number(form.toiletCuts) || 0) * PRICING.extras.toiletCut);
+  extrasTotal += Math.round((Number(form.sinkStandCuts) || 0) * PRICING.extras.sinkStandCut);
+  if (form.circleWindow) extrasTotal += PRICING.extras.circleWindowCut;
+  if (form.circleWindowMosaic) extrasTotal += PRICING.extras.circleWindowMosaicInside;
+  const mitredLm = Number(form.mitredEdgesLm) || 0;
+  const fabricationDays = Number(form.fabricationDays) || 0;
+  if (mitredLm > PRICING.fabrication.thresholdLm) {
+    warnings.push('Consider fabrication day rate for mitred edges over 10 linear metres.');
+    if (fabricationDays > 0) {
+      extrasTotal += Math.round(fabricationDays * PRICING.fabrication.mitreDayRate);
+      assumptions.push(`Mitred edge fabrication day rate applied for ${fabricationDays} day(s).`);
+    } else {
+      extrasTotal += Math.round(mitredLm * PRICING.extras.mitredEdgesResinPerLm);
+    }
+  } else {
+    extrasTotal += Math.round(mitredLm * PRICING.extras.mitredEdgesResinPerLm);
+  }
+  extrasTotal += Math.round((Number(form.interruptiveExtras) || 0) * PRICING.uplifts.interruptiveMinimum);
+
+  const autoEpoxyFloorLm = calcEstimatedLinearMetres(floor.chargedArea, form.epoxyFloorTileLengthMm, form.epoxyFloorTileWidthMm, 'straight');
+  const autoEpoxyWallLm = calcEstimatedLinearMetres(wall.chargedArea, form.epoxyWallTileLengthMm, form.epoxyWallTileWidthMm, 'straight');
+  const epoxyFloorLm = form.useAutoLinearMetres ? autoEpoxyFloorLm : (Number(form.epoxyFloorLm) || 0);
+  const epoxyWallLm = form.useAutoLinearMetres ? autoEpoxyWallLm : (Number(form.epoxyWallLm) || 0);
+  const epoxyCombinedLm = epoxyFloorLm + epoxyWallLm;
+  const epoxyTotal = calcEpoxy(form.epoxyEnabled, form.epoxyMode, epoxyCombinedLm, form.epoxyDays);
+  if (form.epoxyEnabled) assumptions.push('Epoxy priced using selected epoxy mode.');
+
+  let subtotal = labourTotal + materialsTotal + prepTotal + removalTotal + ufhTotal + extrasTotal + epoxyTotal;
+  const miscTotal = (Number(form.miscItem1Price) || 0) + (Number(form.miscItem2Price) || 0);
+  subtotal += miscTotal;
+  const packageGuide = getPackageTargetGuide(subtotal);
+  if (form.packageMode === 'manual' && Number(form.packageOverrideValue) > 0) { subtotal = Number(form.packageOverrideValue); assumptions.push('Manual package price override applied.'); }
+  else subtotal = applyLargeFloorPackageLogic(subtotal, floor.chargedArea + wall.chargedArea, form.packageMode, assumptions, warnings);
+
+  const manualAdjustmentValue = Math.round(subtotal * ((Number(form.manualAdjustmentPercent) || 0) / 100));
+  subtotal += manualAdjustmentValue;
+  let roundingAdjustmentValue = 0;
+  if ((Number(form.roundedFinalTotal) || 0) > 0) {
+    roundingAdjustmentValue = Math.round((Number(form.roundedFinalTotal) || 0) - subtotal);
+    subtotal = Number(form.roundedFinalTotal) || subtotal;
+    assumptions.push('Manual rounded final total applied.');
+  } else if ((Number(form.roundFinalTotalTo) || 0) > 0) {
+    const roundTo = Number(form.roundFinalTotalTo) || 0;
+    const rounded = Math.ceil(subtotal / roundTo) * roundTo;
+    roundingAdjustmentValue = Math.round(rounded - subtotal);
+    subtotal = rounded;
+    assumptions.push(`Rounded final total to nearest £${roundTo}.`);
+  }
+  if ((Number(form.manualAdjustmentPercent) || 0) !== 0) assumptions.push(`Manual percentage adjustment applied: ${form.manualAdjustmentPercent > 0 ? '+' : ''}${form.manualAdjustmentPercent}%.`);
+  if (form.fiddlyFloor && floor.chargedArea > 0) warnings.push('Fiddly floor uplift used, not automatic day-rate logic.');
+  if (form.fiddlyWall && wall.chargedArea > 12) warnings.push('Fiddly wall selected, but 2-day protection only triggers on smaller wall areas.');
+
+  return { floor, wall, activeLinearMetres, epoxyFloorLm, epoxyWallLm, subtotal: Math.round(subtotal), materialsTotal, prepTotal, removalTotal, ufhTotal, extrasTotal, epoxyTotal, miscTotal, manualAdjustmentValue, roundingAdjustmentValue, assumptions, warnings, packageGuide, notes: form.notes || '' };
+}
+
+
+function calculateBoards() {
+  const area = Number(document.getElementById('boardingArea')?.value) || 0;
+  const boardType = document.getElementById('boardType')?.value || 'cement';
+  const coveragePerBoard = boardType === 'ply' ? 2.88 : 0.72;
+  const boardInput = document.getElementById('boardCount');
+  if (!boardInput) return;
+  if (!area) {
+    boardInput.value = 0;
+    return;
+  }
+  const boards = Math.ceil(area / coveragePerBoard);
+  boardInput.value = boards;
+}
+
+
+async function sharePdfFile(blob, filename) {
+  try {
+    const file = new File([blob], filename, { type: 'application/pdf' });
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      await navigator.share({
+        files: [file],
+        title: 'Quote',
+        text: 'Here is your quote PDF'
+      });
+      return true;
+    }
+  } catch (err) {
+    console.error('Share failed:', err);
+  }
+  return false;
+}
+
+async function savePdfMobileSafe(doc, filename) {
+  const isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent || '');
+  try {
+    const blob = doc.output('blob');
+
+    if (isMobile) {
+      const shared = await sharePdfFile(blob, filename);
+      if (shared) return;
+    }
+
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    setTimeout(() => URL.revokeObjectURL(url), 4000);
+  } catch (err) {
+    console.error(err);
+    try { doc.save(filename); } catch (e) {}
+  }
+}
+
+function render() {
+  syncDisplayedCustomRates();
+  const form = getState();
+  const result = calculateQuote(form);
+
+  document.getElementById('fullSection').style.display = mode === 'full' ? '' : 'none';
+  document.getElementById('quickBtn').className = `btn ${mode === 'quick' ? 'btnPrimary' : 'btnOutline'}`;
+  document.getElementById('fullBtn').className = `btn ${mode === 'full' ? 'btnPrimary' : 'btnOutline'}`;
+  document.getElementById('totalTopValue').textContent = formatCurrency(result.subtotal);
+
+  document.getElementById('summaryRows').innerHTML =
+    row('Floor charged area', `${result.floor.chargedArea} m²`) +
+    row('Wall charged area', `${result.wall.chargedArea} m²`) +
+    row('Floor labour', formatCurrency(result.floor.labour)) +
+    row('Wall labour', formatCurrency(result.wall.labour)) +
+    row('Materials', formatCurrency(result.materialsTotal)) +
+    row('Prep', formatCurrency(result.prepTotal)) +
+    row('Removal', formatCurrency(result.removalTotal)) +
+    row('UFH', formatCurrency(result.ufhTotal)) +
+    row('Extras', formatCurrency(result.extrasTotal)) +
+    row('Epoxy', formatCurrency(result.epoxyTotal)) +
+    row('Misc items', formatCurrency(result.miscTotal)) +
+    (form.epoxyEnabled ? row('Epoxy floor grout lm', `${result.epoxyFloorLm} lm`) + row('Epoxy wall grout lm', `${result.epoxyWallLm} lm`) : '') +
+    row('Adjustment', formatCurrency(result.manualAdjustmentValue)) +
+    row('Rounding', formatCurrency(result.roundingAdjustmentValue));
+
+  const totalQuotedArea = (Number(result.floor.chargedArea) || 0) + (Number(result.wall.chargedArea) || 0);
+  const allInRate = totalQuotedArea ? Math.round((Number(result.subtotal) || 0) / totalQuotedArea) : 0;
+
+  document.getElementById('jobDetails').innerHTML =
+    row('Floor area', `${result.floor.rawArea || 0} m²`) +
+    row('Wall area', `${result.wall.rawArea || 0} m²`) +
+    row('Estimated linear metres', `${result.activeLinearMetres} lm`) +
+    row('All-in price per m²', allInRate ? `${formatCurrency(allInRate)}/m²` : '—');
+
+  document.getElementById('quoteOutput').innerHTML = buildCustomerQuoteHtml(form, result);
+
+  document.getElementById('assumptions').innerHTML = result.assumptions.length
+    ? result.assumptions.map(item => `<span class="badge">${item}</span>`).join('')
+    : `<p class="muted smallText">No special assumptions.</p>`;
+
+  document.getElementById('warnings').innerHTML = result.warnings.length
+    ? result.warnings.map(item => `<div class="warn">${item}</div>`).join('')
+    : `<p class="muted smallText">No warnings.</p>`;
+
+  document.getElementById('packageGuide').innerHTML = result.floor.chargedArea
+    ? row('Low target', `${formatCurrency(result.packageGuide.low)} (${result.packageGuide.lowDiscount}% off)`) +
+      row('Middle target', `${formatCurrency(result.packageGuide.mid)} (${result.packageGuide.midDiscount}% off)`) +
+      row('Upper target', `${formatCurrency(result.packageGuide.high)} (${result.packageGuide.highDiscount}% off)`) +
+      `<p class="muted tinyText">Low = stronger margin. Middle = balanced. Upper = more aggressive pricing.</p>`
+    : `<p class="muted smallText">Enter a floor area to see low, middle and upper package targets.</p>`;
+
+  window.currentQuote = result;
+}
+
+
+async function downloadPdf() {
+  calculateBoards();
+
+document.querySelectorAll('.toggleBar .btn').forEach(btn => {
+  if (!btn.querySelector('span')) {
+    btn.innerHTML = `<span style="position:relative; top:-1px; display:inline-block;">${btn.textContent.trim()}</span>`;
+  }
+});
+
+render();
+  const result = window.currentQuote;
+  const form = getState();
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+  const pageW = doc.internal.pageSize.getWidth();
+  const pageH = doc.internal.pageSize.getHeight();
+  const margin = 14;
+  const blue = [37, 111, 160];
+  const dark = [15, 23, 42];
+  const lightBlue = [239, 246, 255];
+  const soft = [248, 250, 252];
+  const border = [226, 232, 240];
+  const white = [255, 255, 255];
+
+  let y = 16;
+
+  const ensureSpace = (needed) => {
+    if (y + needed > pageH - 20) {
+      doc.addPage();
+      y = 16;
+    }
+  };
+
+  const textLines = (text, width) => doc.splitTextToSize(String(text || ''), width);
+
+  const drawBrandHeader = () => {
+    doc.setFillColor(...dark);
+    doc.roundedRect(margin, y, pageW - margin * 2, 34, 4, 4, 'F');
+
+    const brandX = margin + 8;
+    const brandY = y + 12;
+
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(18);
+
+    doc.setTextColor(...white);
+    doc.text('Paul ', brandX, brandY);
+
+    const paulWidth = doc.getTextWidth('Paul ');
+    doc.setTextColor(...blue);
+    doc.text('the ', brandX + paulWidth, brandY);
+
+    const theWidth = doc.getTextWidth('the ');
+    doc.setTextColor(...white);
+    doc.text('Tiler', brandX + paulWidth + theWidth, brandY);
+
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(9);
+    doc.setTextColor(...white);
+    doc.text('Wall & Floor Tiling Quote', margin + 8, y + 20);
+    doc.text(PRICING.business.website, pageW - margin - 8, y + 10, { align: 'right' });
+    doc.text(PRICING.business.email, pageW - margin - 8, y + 16, { align: 'right' });
+    doc.text(PRICING.business.phone, pageW - margin - 8, y + 22, { align: 'right' });
+    doc.text(`Date: ${new Date().toLocaleDateString('en-GB')}`, pageW - margin - 8, y + 28, { align: 'right' });
+
+    y += 42;
+  };
+
+  const drawTitleBand = (title, subtitle='') => {
+    ensureSpace(20);
+    doc.setFillColor(...lightBlue);
+    doc.setDrawColor(...border);
+    doc.roundedRect(margin, y, pageW - margin * 2, subtitle ? 18 : 12, 3, 3, 'FD');
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(11);
+    doc.setTextColor(...dark);
+    doc.text(title, margin + 6, y + 8);
+    if (subtitle) {
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(8.5);
+      doc.setTextColor(71, 85, 105);
+      doc.text(subtitle, margin + 6, y + 14);
+    }
+    y += subtitle ? 24 : 16;
+  };
+
+  const drawInfoGrid = (items) => {
+    const colGap = 6;
+    const boxW = (pageW - margin * 2 - colGap) / 2;
+    const top = y;
+    let maxH = 0;
+
+    items.forEach((item, idx) => {
+      const x = idx % 2 === 0 ? margin : margin + boxW + colGap;
+      const boxY = top + Math.floor(idx / 2) * 18;
+      const lines = textLines(item.value, boxW - 12);
+      const boxH = Math.max(14, 8 + (lines.length * 4) + 4);
+      maxH = Math.max(maxH, boxY - top + boxH);
+
+      doc.setFillColor(...soft);
+      doc.setDrawColor(...border);
+      doc.roundedRect(x, boxY, boxW, boxH, 3, 3, 'FD');
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(8.5);
+      doc.setTextColor(100, 116, 139);
+      doc.text(item.label, x + 5, boxY + 5);
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(10);
+      doc.setTextColor(...dark);
+      doc.text(lines, x + 5, boxY + 11);
+    });
+
+    y += maxH + 4;
+  };
+
+  const drawIncludedItem = (title, desc) => {
+    const descLines = textLines(desc, pageW - margin * 2 - 20);
+    const boxH = 12 + descLines.length * 4 + 4;
+    ensureSpace(boxH + 4);
+
+    doc.setFillColor(...white);
+    doc.setDrawColor(...border);
+    doc.roundedRect(margin, y, pageW - margin * 2, boxH, 3, 3, 'FD');
+
+    doc.setFillColor(...blue);
+    doc.circle(margin + 7, y + 7, 1.8, 'F');
+
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(10);
+    doc.setTextColor(...dark);
+    doc.text(title, margin + 12, y + 8);
+
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(9);
+    doc.setTextColor(71, 85, 105);
+    doc.text(descLines, margin + 12, y + 14);
+
+    y += boxH + 4;
+  };
+
+  const drawTotalBox = (packageQuote) => {
+    ensureSpace(26);
+    doc.setFillColor(...blue);
+    doc.roundedRect(margin, y, pageW - margin * 2, 24, 4, 4, 'F');
+
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(10);
+    doc.setTextColor(...white);
+    doc.text(packageQuote ? 'Package Total' : 'Total Quote', margin + 8, y + 9);
+
+    doc.setFontSize(20);
+    doc.text(formatCurrency(result.subtotal), margin + 8, y + 19);
+
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(8.5);
+    doc.text('No VAT added', pageW - margin - 8, y + 9, { align: 'right' });
+    doc.text('Customer supplies tiles only', pageW - margin - 8, y + 15, { align: 'right' });
+    y += 30;
+
+    ensureSpace(18);
+    doc.setFillColor(250, 250, 250);
+    doc.setDrawColor(...border);
+    doc.roundedRect(margin, y, pageW - margin * 2, 16, 3, 3, 'FD');
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(8.5);
+    doc.setTextColor(71, 85, 105);
+    doc.text('• Protection of surrounding areas throughout works', margin + 6, y + 6);
+    doc.text('• Final clean and professional finish', margin + 6, y + 12);
+    y += 20;
+  };
+
+  const drawFooterNote = (text) => {
+    if (!String(text || '').trim()) return;
+    const lines = textLines(text, pageW - margin * 2 - 12);
+    const boxH = 12 + lines.length * 4 + 4;
+    ensureSpace(boxH + 2);
+    doc.setFillColor(250, 250, 250);
+    doc.setDrawColor(...border);
+    doc.roundedRect(margin, y, pageW - margin * 2, boxH, 3, 3, 'FD');
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(9);
+    doc.setTextColor(...dark);
+    doc.text('Notes', margin + 6, y + 7);
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(8.5);
+    doc.setTextColor(71, 85, 105);
+    doc.text(lines, margin + 6, y + 13);
+    y += boxH + 3;
+  };
+
+  const includedItems = buildIncludedItems(form, result);
+  const packageQuote = isPackageQuote(form, result);
+  const jobTypeLabel =
+    form.jobType === 'floor' ? 'Floor tiling' :
+    form.jobType === 'wall' ? 'Wall tiling' : 'Wall & floor tiling';
+
+  drawBrandHeader();
+
+  drawTitleBand(
+    packageQuote ? 'Package Quote Summary' : 'Quote Summary',
+    form.facingCustomerMode
+      ? (packageQuote ? 'Customer-facing package presentation based on the options selected.' : 'Customer-facing quote presentation based on the options selected.')
+      : (packageQuote ? 'Package presentation based on the options selected.' : 'Quote presentation based on the options selected.')
+  );
+
+  drawInfoGrid([
+    { label: 'Job type', value: jobTypeLabel },
+    { label: 'Floor area', value: `${result.floor.rawArea || 0} m²` },
+    { label: 'Wall area', value: `${result.wall.rawArea || 0} m²` },
+    { label: form.clientName || form.clientAddress ? 'Prepared for' : 'Location', value: form.clientName || form.clientAddress ? [form.clientName, form.clientAddress].filter(Boolean).join(', ') : PRICING.business.location }
+  ]);
+
+  drawTitleBand(
+    packageQuote ? 'Included in this package' : 'Included in this quote',
+    'Only the selected preparation, installation, and finishing items are shown below.'
+  );
+
+  if (!includedItems.length) {
+    drawIncludedItem('Tiling installation', 'Tiling installation based on the information provided.');
+  } else {
+    includedItems.forEach(item => drawIncludedItem(item.title, item.desc));
+  }
+
+  drawTotalBox(packageQuote);
+  drawFooterNote(form.notes);
+
+  await savePdfMobileSafe(doc, `paul-the-tiler-quote-${new Date().toISOString().slice(0, 10)}.pdf`);
+}
+
+
+document.getElementById('quickBtn').addEventListener('click', () => { mode='quick'; calculateBoards();
+render(); });
+document.getElementById('fullBtn').addEventListener('click', () => { mode='full'; calculateBoards();
+render(); });
+document.getElementById('pdfBtnTop').addEventListener('click', downloadPdf);
+document.getElementById('pdfBtnBottom').addEventListener('click', downloadPdf);
+
+
+document.getElementById('customFloorRate').addEventListener('input', () => {
+  document.getElementById('floorTileType').value = 'custom';
+  calculateBoards();
+render();
+});
+document.getElementById('customFloorRate').addEventListener('change', () => {
+  document.getElementById('floorTileType').value = 'custom';
+  calculateBoards();
+render();
+});
+document.getElementById('customWallRate').addEventListener('input', () => {
+  document.getElementById('wallTileType').value = 'custom';
+  calculateBoards();
+render();
+});
+document.getElementById('customWallRate').addEventListener('change', () => {
+  document.getElementById('wallTileType').value = 'custom';
+  calculateBoards();
+render();
+});
+
+Array.from(document.querySelectorAll('input, select, textarea')).forEach(el => {
+  el.addEventListener('input', () => { calculateBoards(); calculateBoards();
+render(); });
+  el.addEventListener('change', render);
+});
+
+calculateBoards();
+render();
+</script>
+</body>
+</html>
